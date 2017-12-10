@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="../../css/iuapmobile.um.css">
+		<link rel="stylesheet" href="../../css/mint.css">
+		<link rel="stylesheet" href="../../css/fonts/iconfont.css">
+		<link rel="stylesheet" href="./quotedPrice.min.css">
+		<script src="../../js/summer.js" ></script>
+		<script src="../../js/jquery.min.js" ></script>
+		<script src="../../js/font.js" ></script>
+		<script src="../../js/vue.js" ></script>
+		<script src="../../js/mint.js" ></script>
+		<script src="../../js/Frameworks/iuapmobile.frameworks.ui.js" ></script>
+	</head>
+	<body>
+		<div class="um-win" id="quotedPriceDetail" v-cloak>
+			<div class="um-content quotedPriceDetail">
+				<ul>
+					<li class="spec"><b>合同金额</b><span>{{quoted.allPrice}}&nbsp;元</span></li>
+					<li @click="surePicker('term')">
+						<b>租赁期数</b>
+						<span>
+							<b v-if="quoted.term">{{quoted.term}}</b>
+							<b v-else class="default">请选择</b>
+							<i class="icon iconfont icon-enter"></i>
+						</span>
+					</li>
+					<li class="liContr">
+						<b>合同周期</b>
+						<span class="fr">
+							{{quoted.contractTerm}}&nbsp;个月
+						</span>
+					</li>
+					<li>
+						<b>租赁年利率</b>
+						<span>
+							<input type="text" v-model="quoted.rate" @input="rateCheck" placeholder="请输入年利率">&nbsp;%
+						</span>
+					</li>
+					<li class='spec' @click="surePicker('payType')">
+						<b>支付方式</b>
+						<span>
+							<b v-if="quoted.payType">{{quoted.payType}}</b>
+							<b v-else class="default">请选择</b>
+							<i class="icon iconfont icon-enter"></i>
+						</span>
+					</li>
+					<li @click="pickFirstRate">
+						<b>首付比例</b>
+						<span>
+							<b v-if="quoted.sureFirstPay">{{quoted.sureFirstPayRate}}&nbsp;% &nbsp;&nbsp;&nbsp;{{quoted.sureFirstPay}}&nbsp;元</b>
+							<b v-else class="default">请选择</b>
+							<i class="icon iconfont icon-enter"></i>
+						</span>
+					</li>
+					<li @click="pickerBail">
+						<b>保证金</b>
+						<span>
+							<b v-if="quoted.lastBail">{{quoted.sureBailType}}&nbsp;&nbsp;&nbsp;{{quoted.sureBailRate}}&nbsp;% &nbsp;&nbsp;&nbsp;{{quoted.lastBail}}&nbsp;元</b>
+							<b v-else class="default">请选择</b>
+							<i class="icon iconfont icon-enter"></i>
+							<!-- <button type="button" name="button" v-if="!quoted.bailType" @click="surePicker('bail')">点击选择基数</button>
+							<button type="button" name="button" v-else @click="surePicker('bail')">{{quoted.bailType}}</button>
+
+							<input type="text" name="bailRate" @input="changeBail" v-model="quoted.bailRate"> %
+							<input type="text" name="bail" @blur="changBailRate" v-model="quoted.bail">&nbsp;元 -->
+						</span>
+					</li>
+					<li class="input">
+						<b>咨询费</b>
+						<span>
+							<input type="text" @input="checkVal('fee')" placeholder="请输入咨询费" name="consultingFee" v-model="quoted.consultingFee">&nbsp;元
+						</span>
+					</li><li class="input">
+						<b>保险保证金</b>
+						<span>
+							<input type="text" @input="checkVal('bail')" placeholder="请输入保险保证金" name="sureBail" v-model="quoted.sureBail">&nbsp;元
+						</span>
+
+					</li>
+					<li class='spec input'>
+						<b>GPS费</b>
+						<span>
+							<input type="text" @input="checkVal('gps')" placeholder="请输入GPS费" name="gps" v-model="quoted.gps">&nbsp;元
+						</span>
+					</li>
+					<li><b>首期款</b><span>{{resultData.firstPrice}}&nbsp;元</span></li>
+					<li><b>每期租金</b><span>{{resultData.termPrice}}&nbsp;元</span></li>
+					<li><b>期数</b><span>{{resultData.term}}</span></li>
+				</ul>
+
+      </div>
+			<div class="um-footer" id="footer">
+				<mt-popup v-model="pickerStatus" v-if="pickerStatus" position="bottom" class="pickerPrice">
+					<mt-picker :slots="slots" @change="onValuesChange"></mt-picker>
+					<p><span class="fl" @click="surePicker">取消</span><span class="fr" @click="surePicker('','confirm')">确定</span></p>
+				</mt-popup>
+				<mt-popup v-model="firstPayStatu" class="firstPayCont" v-else-if="firstPayStatu" position="bottom">
+					<ul v-if="moneyToRate">
+						<li class="input">
+							<b>首付金额</b>
+							<span><input type="text" @input="changeFirstPayRate" placeholder="请输入您的金额" name="firstPay" v-model="quoted.firstPay">&nbsp;元</span>
+						</li>
+						<li class="alertLi">当前为金额计算，<button @click="moneyToRateStatus">改为百分比计算</button></li>
+						<li>
+							<b>百分百</b>
+							<span> <b v-if="quoted.firstPayRate">{{quoted.firstPayRate}}</b>
+							<b v-else class="default">自动计算</b>&nbsp;%</span>
+						</li>
+					</ul>
+					<ul v-else>
+						<li class="input">
+							<b>百分百</b>
+							<span><input type="text" maxlength='5' @input="changeFirstPay" placeholder='请输入百分百' name="firstPayRate" v-model="quoted.firstPayRate">&nbsp;%</span>
+						</li>
+						<li class="alertLi">当前为百分百计算，<button @click="moneyToRateStatus">改为金额计算</button></li>
+						<li class="input">
+							<b>首付金额</b>
+							<span>
+								<b v-if="quoted.firstPay">{{quoted.firstPay}}</b>
+								<b v-else class="default">自动计算</b>&nbsp;元
+							</span>
+						</li>
+					</ul>
+					<p><span class="fl" @click="pickFirstRate">取消</span><span class="fr" @click="sureFristPay">确定</span></p>
+				</mt-popup>
+				<mt-popup v-model="bailStatue" class="firstPayCont" v-else-if="bailStatue" position="bottom">
+					<ul>
+						<li>
+							<b>保证金方式</b>
+							<span>
+								<button type="button" name="button" @click="toggleClass($event,'首期款')">首期款</button><button type="button" name="button" class="active" @click="toggleClass($event,'融资额')">融资额</button>
+							</span>
+						</li>
+					</ul>
+					<ul v-if="bailToRate">
+						<li class="input">
+							<b>保证金金额</b>
+							<span><input type="text" @input="changBailRate" placeholder="请输入您的金额" name="bail" v-model="quoted.bail">&nbsp;元</span>
+						</li>
+						<li class="alertLi">当前为金额计算，<button @click="bailToRateStatus">改为百分比计算</button></li>
+						<li>
+							<b>百分百</b>
+							<span> <b v-if="quoted.bailRate">{{quoted.bailRate}}</b>
+							<b v-else class="default">自动计算</b>&nbsp;%</span>
+						</li>
+					</ul>
+					<ul v-else>
+						<li class="input">
+							<b>百分百</b>
+							<span><input type="text" maxlength='5' @input="changeBail" placeholder="请输入百分百" name="bail" v-model="quoted.bailRate">&nbsp;%</span>
+						</li>
+						<li class="alertLi">当前为百分百计算，<button @click="bailToRateStatus">改为金额计算</button></li>
+						<li class="input">
+							<b>保证金金额</b>
+							<span>
+								<b v-if="quoted.bail">{{quoted.bail}}</b>
+								<b v-else class="default">自动计算</b>&nbsp;元
+							</span>
+						</li>
+					</ul>
+					<p><span class="fl" @click="pickerBail">取消</span><span class="fr" @click="sureBail">确定</span></p>
+				</mt-popup>
+				<template v-else>
+					<button>测算</button>
+				</template>
+			</div>
+    </div>
+    <script>
+      var quotedVue=new Vue({
+          el:'#quotedPriceDetail',
+          data(){
+            return {
+							termList:['3个月','6个月','12个月','18个月','24个月','48个月'],
+							// termType:['月'],
+							payTypeList:['期末等额本息','期末不等额'],
+							bailList:["融资额","首期款"],
+							pickerStatus:false,
+							bailStatue:false,
+							firstPayStatu:false,
+							moneyToRate:true,
+							bailToRate:true,
+							pickerType:'payType',
+							pickerVal:'',
+							quoted:{
+								allPrice:'20000.00',
+								term:'', //租赁期数
+								contractTerm:'',
+								rate:50,
+								payType:'',
+								firstPayRate:'', //待定首付比例
+								sureFirstPayRate:'', //选择的首付比例
+								firstPay:'',
+								sureFirstPay:'',
+								bail:'', //保证金
+								sureBail:'', //保证金
+								bailRate:'',  //保证金比例
+								sureBailRate:'',  //保证金比例
+								bailType:'融资额',  //选择的保证金类型
+								sureBailType:'',  //确认的保证金类型
+								gps:'',
+								consultingFee:'',
+								sureBail:'',
+							},
+							resultData:{
+								firstPrice:'134000.00',
+								termPrice:'4873.32',
+								term:23
+							}
+            }
+          },
+					computed:{
+						slots(){
+							var pickerObj={
+								flex: 1,
+								values: [],
+								defaultIndex:0,
+								className: 'slot1',
+								textAlign: 'center'
+							},i='';
+							if(this.pickerType=='term'){
+								pickerObj.values=this.termList;
+								i=this.termList.indexOf(this.quoted.term);
+							}else if(this.pickerType=='payType'){
+								pickerObj.values=this.payTypeList;
+								i=this.payTypeList.indexOf(this.quoted.payType);
+							}else if(this.pickerType=='bail'){
+								pickerObj.values=this.bailList;
+								i=this.bailList.indexOf(this.quoted.bailType);
+							}
+							if(i>-1){pickerObj.defaultIndex=i}
+							return [pickerObj]
+						}
+					},
+					methods:{
+						sureBail(){
+							this.quoted.lastBail=this.quoted.bail
+							this.quoted.sureBailRate=this.quoted.bailRate
+							this.quoted.sureBailType=this.quoted.bailType
+							this.bailStatue=false
+						},
+						bailToRateStatus(){
+							this.bailToRate=!this.bailToRate
+						},
+						toggleClass(e,str){
+							if(str=="首期款"&&!this.quoted.sureFirstPay){
+								summer.toast({msg:"请先选择首付比例"})
+								console.log("ss");
+								return
+							}
+							this.quoted.bail=''
+							this.quoted.bailRate=''
+							$(e.currentTarget).addClass('active').siblings().removeClass('active')
+							this.quoted.bailType=str
+						},
+						pickerBail(){
+							this.bailStatue=!this.bailStatue
+						},
+						moneyToRateStatus(){
+							this.moneyToRate=!this.moneyToRate
+						},
+						sureFristPay(){
+							this.quoted.sureFirstPay=this.quoted.firstPay
+							this.quoted.sureFirstPayRate=this.quoted.firstPayRate
+							this.firstPayStatu=false
+						},
+						pickFirstRate(){
+							this.firstPayStatu=!this.firstPayStatu
+						},
+						onValuesChange(picker,values) {
+							this.pickerVal=values[0];
+							console.log(this.pickerVal)
+				    },
+						surePicker(item,status){
+							this.pickerStatus=!this.pickerStatus;
+							if(status=='confirm'){
+								if(this.pickerType=='term'){
+									this.quoted.term=this.pickerVal
+									var i=this.quoted.term.indexOf("个");
+									this.quoted.contractTerm=this.quoted.term.substring(0,i);
+								}else if(this.pickerType=='payType'){
+									this.quoted.payType=this.pickerVal
+								}else if(this.pickerType=='bail') {
+									this.quoted.bailType=this.pickerVal
+									var number=this.bailTypeReset();
+									this.quoted.bail=this.quoted.bailRate*number*0.01
+								}
+							}else if(item){
+								this.pickerType=item;
+							}
+						},
+						rateCheck(){
+							var val=String(this.quoted.rate).trim();
+							if(!/^([1-9]\d{0,9}|0)([.]?|(\.\d{1,2})?)$/.test(val)||!val||val<0||val>100){
+								this.quoted.rate=''
+							}
+						},
+						changeFirstPay(){
+							var val=String(this.quoted.firstPayRate).trim();
+							if(!/^([1-9]\d{0,9}|0)([.]?|(\.\d{1,2})?)$/.test(val)||!val||val<0||val>100){
+								this.quoted.firstPayRate=''
+								this.quoted.firstPay=''
+							}else {
+								this.quoted.firstPay=this.quoted.firstPayRate*this.quoted.allPrice*0.01
+								if(!this.quoted.firstPay){this.quoted.firstPay=''}
+							}
+
+						},
+						changeFirstPayRate(){
+							var val=String(this.quoted.firstPay).trim();
+							if(!/^([1-9]\d{0,9}|0)([.]?|(\.\d{1,2})?)$/.test(val)||!val||val<0||val>parseFloat(this.quoted.allPrice)){
+								this.quoted.firstPay=''
+								this.quoted.firstPayRate=''
+							}else {
+								this.quoted.firstPayRate=parseFloat(100*this.quoted.firstPay/this.quoted.allPrice).toFixed(2);
+							}
+						},
+						changeBail(){
+							var val=parseFloat(String(this.quoted.bailRate).trim());
+							if(!/^([1-9]\d{0,9}|0)([.]?|(\.\d{1,2})?)$/.test(val)||!val||val<0||val>100){
+								this.quoted.bailRate=''
+								this.quoted.bail=''
+							}else {
+								if(!this.quoted.bailRate){this.quoted.bail='';return}
+								var number=this.bailTypeReset();
+								this.quoted.bail=this.quoted.bailRate*number*0.01
+							}
+						},
+						bailTypeReset(){
+							var number=0;
+							if(this.quoted.bailType=="融资额"){
+								number=this.quoted.allPrice;
+							}else if(this.quoted.bailType=="首期款"){
+								number=this.quoted.firstPay;
+							}
+							return parseFloat(number)
+						},
+						changBailRate(){
+							var val=parseFloat(String(this.quoted.bail).trim()),number=this.bailTypeReset();
+							console.log(val,number);
+							if(!/^([1-9]\d{0,9}|0)([.]?|(\.\d{1,2})?)$/.test(val)||!val||val<0||val>number){
+								this.quoted.bail=''
+								this.quoted.bailRate=''
+							}else {
+								this.quoted.bailRate=parseFloat(100*this.quoted.bail/number).toFixed(2);
+							}
+						},
+						checkVal(value){
+							var val='';
+							if(value=='fee'){
+								val=this.quoted.consultingFee;
+								if(!/^([1-9]\d{0,9}|0)([.]?|(\.\d{1,2})?)$/.test(val)||!val||val<0||val>=parseFloat(this.quoted.allPrice)){
+									this.quoted.consultingFee=''
+								}
+							}else if (value=='bail') {
+								val=this.quoted.sureBail;
+								if(!/^([1-9]\d{0,9}|0)([.]?|(\.\d{1,2})?)$/.test(val)||!val||val<0||val>=parseFloat(this.quoted.allPrice)){
+									this.quoted.sureBail=''
+								}
+							}else if (value=='gps') {
+								val=this.quoted.gps;
+								if(!/^([1-9]\d{0,9}|0)([.]?|(\.\d{1,2})?)$/.test(val)||!val||val<0||val>=parseFloat(this.quoted.allPrice)){
+									this.quoted.gps=''
+								}
+							}
+
+						},
+						save(){
+							// http
+							summer.closeToWin({id:'setProject'})
+						}
+					}
+        })
+			function save(){
+				quotedVue.save()
+			}
+    </script>
+  </body>
+</html>

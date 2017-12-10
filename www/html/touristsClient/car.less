@@ -1,0 +1,195 @@
+out:car.min.css,sourcemap:false,compress:true;
+/*less模块*/
+@import "../../css/comment.less";
+/*重定义通用*/
+input::-webkit-input-placeholder {
+    color: @grayColor;
+    font-size: 14px;
+}
+.addCar{
+  font-size: 14px;
+  table{
+
+    width:100%;
+    background:@white;
+    tr{
+      border-bottom:1px solid @borderColor;
+      td{
+        height:.88rem;
+        line-height:.88rem;
+        padding-left:.56rem;
+        color:@fontColor;
+        font-size:14px;
+        &:last-child{
+          text-align:right;
+          padding-left: 0;
+          padding-right: .56rem;
+
+          span{
+            padding-right: .1rem;
+            &.grayColor{
+              color:@grayColor;
+            }
+          }
+          >i{
+            vertical-align: middle;
+          }
+        }
+        input{
+          border:none;
+          // border-bottom: 1px solid @borderColor;
+          height:.6rem;
+          text-align: right;
+          outline:none;
+        }
+        // input::-webkit-outer-spin-button,
+        // input::-webkit-inner-spin-button {
+        //     -webkit-appearance: none !important;
+        //     margin: 0;
+        // }
+        button{
+          color:@grayColor;
+          border:1px solid @borderColor;
+          font-size: 12px;
+          padding:0;
+          width:1rem;
+          height:.46rem;
+          line-height:.46rem;
+          &:first-child{border-right: none;}
+          &:last-child{border-left: none;}
+          &.active{
+            color:@white;
+            background:@grayBlue;
+          }
+        }
+      }
+    }
+  }
+
+}
+.pickerColor{
+  // position:fixed;
+  // left:0;
+  // bottom:0;
+  width:100%;
+  // z-index: 10;
+  background: @white;
+  .picker-item{
+    font-size: 14px;
+  }
+  >p{
+    line-height: .88rem;
+    padding: 0 .56rem;
+    color:@grayBlue;
+    border-top: 1px solid @E0;
+    span{
+      color:@grayBlue;
+      &:last-child{float:right;}
+    }
+  }
+}
+#pickerDealer{
+  .dealerList{
+    background: @white;
+    // padding:.22rem 0;
+    li{
+      height:.68rem;
+      line-height: .68rem;
+      padding:0 .56rem;
+      border-bottom:1px solid @borderColor;
+      font-size: 14px;
+      color:fontColor;
+    }
+  }
+  .mint-popup{
+    width:100%;
+    >p{
+      line-height: .88rem;
+      padding: 0 .56rem;
+      color:@grayBlue;
+      border-top: 1px solid @E0;
+    }
+    ul{
+      // padding-bottom:.44rem;
+      li{
+        border-top:1px solid @borderColor;
+        padding:.28rem .56rem;
+
+        p{
+          color:@grayColor;
+          font-size: 12px;
+          line-height: .4rem;
+          &:first-child{
+            color:@fontColor;
+            font-size: 14px;
+            line-height: .6rem;
+          }
+        }
+        span{
+          position: absolute;
+          top:1rem;
+          right:.44rem;
+          border:1px solid @borderColor;
+          padding-left: .08rem;
+          width: .48rem;
+          height:.48rem;
+          border-radius: 50%;
+          i{color:@white;}
+        }
+        &.active span{background:@grayBlue;}
+      }
+    }
+  }
+}
+.um-input-group{
+  padding:.16rem;
+  height:.88rem;
+  line-height:.6rem;
+  background:@bgColor;
+  font-size: 14px;
+  *{
+    height:.6rem;
+    line-height:.6rem;
+  }
+  input{
+    background: @white;
+    border-radius: .08rem;
+    font-size: 14px;
+    // text-indent: .4rem;
+    padding:0 0 0 .6rem;
+  }
+  .icon-nav_search{
+      left:.3rem;
+      position: absolute;
+      top:.15rem;
+      z-index: 1;
+  }
+  // button{
+  //   position:absolute;
+  //   padding:0;
+  //   right:.6rem;
+  //   width:1.2rem;
+  //   border-top-right-radius: .3rem;
+  //   border-bottom-right-radius: .3rem;
+  // }
+}
+.modelsList{
+  border-top:1px solid @borderColor;
+  p{
+    padding:0 .56rem;
+    background: @bgColor;
+    font-size: 14px;
+    color:@fontColor;
+  }
+}
+.pickerModels{
+    background: @white;
+    font-size: 14px;
+    color:@fontColor;
+    li{
+      height:.68rem;
+      line-height: .68rem;
+      padding:0 .56rem;
+      border-bottom:1px solid @borderColor;
+    }
+  }

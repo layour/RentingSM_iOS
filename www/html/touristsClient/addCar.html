@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+		<meta charset="UTF-8">
+		<title>添加车辆</title>
+		<link rel="stylesheet" href="../../css/iuapmobile.um.css">
+		<link rel="stylesheet" href="../../css/fonts/iconfont.css">
+		<link rel="stylesheet" href="../../css/mint.css">
+		<link rel="stylesheet" href="./car.min.css">
+		<script src="../../js/summer.js" ></script>
+		<script src="../../js/jquery.min.js" ></script>
+		<script src="../../js/font.js" ></script>
+		<script src="../../js/vue.js" ></script>
+		<script src="../../js/mint.js" ></script>
+		<script src="../../js/Frameworks/iuapmobile.frameworks.ui.js" ></script>
+	</head>
+	<body>
+		<div class="um-win" id="addCar" v-cloak>
+			<div class="um-content addCar">
+        <table>
+          <tr @click="pickerDealer">
+            <td>经销商</td>
+            <td>
+							<span v-if='dealer'>{{dealer}}</span><span class="grayColor" v-else>请选择</span>
+							<i class="icon iconfont icon-enter"></i>
+						</td>
+          </tr>
+					<tr>
+						<td>车辆状况</td>
+						<td>
+							<button @click="changCarStatus($event,'new')" class='btn btn-inline btn-sm active'>新车</button><button @click="changCarStatus($event,'old')" class="btn btn-inline btn-sm">二手车</button>
+						</td>
+					</tr>
+					<tr @click="pickerModels">
+            <td>选择车型</td>
+            <td>
+							<span v-if='carModels'>{{carModels}}</span><span class="grayColor"  v-else>请选择</span>
+							<i class="icon iconfont icon-enter"></i>
+						</td>
+          </tr>
+					<tr @click="surePickerColor">
+            <td>车身颜色</td>
+            <td>
+							<span v-if='color'>{{color}}</span><span  class="grayColor" v-else>请选择</span>
+							<i class="icon iconfont icon-enter"></i>
+						</td>
+          </tr>
+					<tr>
+            <td>新车指导价</td>
+            <td>
+							<input type="text" @input="checkNumber($event,'guidePrice')" name="price" placeholder="请输入指导价" v-model="guidePrice">
+						</td>
+					</tr>
+					<tr>
+            <td>留购价</td>
+            <td>
+							<input type="text" @input="checkNumber($event,'holdPrice')" name="holdPrice" placeholder="请输入留购价" v-model="holdPrice">
+						</td>
+					</tr>
+        </table>
+				<mt-popup v-model="pickerColorStatus" position='bottom' class="pickerColor">
+					<mt-picker :slots="slots" @change="onValuesChange"></mt-picker>
+					<p><span class="" @click="surePickerColor">取消</span><span class="" @click="surePickerColor('confirm')">确定</span></p>
+				</mt-popup>
+			</div>
+		</div>
+		<script>
+				var addCar=new Vue({
+					el:'#addCar',
+					data(){
+						return{
+							dealer:'',
+							carStatus:'new',
+							carModels:'',
+							color:'',
+							guidePrice:'',
+							holdPrice:'',
+							pickerColorStatus:false,
+							pickedColor:'',
+							slots: [
+								{
+									flex: 1,
+									values: ['白色', '黑色', '蓝色', '红色', '其他', '紫色'],
+									defaultIndex:2,
+									className: 'slot1',
+									textAlign: 'center'
+								}
+							]
+						}
+					},
+					created(){
+
+					},
+					methods:{
+						checkNumber(e,param){
+							var val=$(e.currentTarget).val()
+							if(!/^([1-9]\d{0,9}|0)([.]?|(\.\d{1,2})?)$/.test(val)){
+								if(param=='guidePrice'){
+									this.guidePrice=''
+								}else{
+									this.holdPrice=''
+								}
+							}
+						},
+						pickerDealer(){
+							summer.openWin({
+								id:'pickerDealer',
+								url:'html/touristsClient/pickerDealer.html',
+								create:false,
+								type:'actionBar',
+								actionBar: {
+						      title: "选择经销商",
+						      titleColor: "#ffffff",
+						      backgroundColor: "#039BE5",
+						      leftItem:{
+						          image: "img/back.png",
+						          method:'',
+						          text:"返回",
+						          textColor:"#ffffff"
+						      }
+								}
+							})
+						},
+						pickerModels(){
+							summer.openWin({
+								id:'pickerModels',
+								url:'html/touristsClient/pickerModels.html',
+								create:false,
+								type:'actionBar',
+								actionBar: {
+						      title: "选择车型",
+						      titleColor: "#ffffff",
+						      backgroundColor: "#039BE5",
+						      leftItem:{
+						          image: "img/back.png",
+						          method:'',
+						          text:"返回",
+						          textColor:"#ffffff"
+						      }
+								}
+							})
+						},
+						changCarStatus(e,status){
+							$(e.currentTarget).addClass('active').siblings('.active').removeClass('active');
+							this.carStatus=status;
+						},
+						onValuesChange(picker,values) {
+							this.pickedColor=values[0];
+				    },
+						surePickerColor(param){
+							this.pickerColorStatus=!this.pickerColorStatus;
+							if(param=='confirm'){
+								this.color=this.pickedColor;
+							}
+						},
+						save(){
+							summer.closeWin()
+						}
+					}
+				});
+				function getDealer(){
+					var dealer=summer.getStorage('pickerDealer');
+					if(dealer){
+						addCar.dealer=JSON.parse(dealer).name;
+					}
+				}
+				function getModels(){
+					var models=summer.getStorage('pickerModels');
+					if(models){
+						addCar.carModels=models;
+					}
+				}
+				function save(){
+					addCar.save()
+				}
+		</script>
+	</body>
+</html>

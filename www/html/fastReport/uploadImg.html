@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="../../css/iuapmobile.um.css">
+		<link rel="stylesheet" href="../../css/mint.css">
+		<link rel="stylesheet" href="../../css/fonts/iconfont.css">
+
+		<script src="../../js/summer.js" ></script>
+		<script src="../../js/jquery.min.js" ></script>
+		<script src="../../js/font.js" ></script>
+		<script src="../../js/vue.js" ></script>
+		<script src="../../js/mint.js" ></script>
+		<script src="../../js/Frameworks/iuapmobile.frameworks.ui.js" ></script>
+		<style>
+			.uploadImg{
+				font-size: 14px;
+				color:#9E9E9E;
+			}
+			.uploadImg ul{
+				overflow:hidden;
+				padding:0 .56rem;
+			}
+			.uploadImg ul li{
+				padding:.4rem .4rem 0 .4rem;
+				width:50%;
+				float:left;
+				text-align: center;
+
+				border:1px solid #EFEFEF;
+			}
+			.uploadImg ul li:nth-child(even){
+				padding-right: 0;
+			}
+			.uploadImg ul li:nth-child(odd){
+				padding-left: 0;
+			}
+			.uploadImg ul li div{
+				background: #fff;
+			}
+			.uploadImg ul li p{margin-top: .2rem;}
+			.uploadImg ul li i {
+				display: inline-block;
+				width:.72rem;
+				height:.72rem;
+				margin: .94rem 0;
+				font-size: 36px;
+				position: relative;
+				top:-.2rem;
+				color:#DEDEDE;
+			}
+			.uploadImg ul li img{
+				width:100%;
+				height:2.6rem;
+			}
+			.mint-popup{
+				width:100%;
+				padding-top:.2rem;
+			}
+			.mint-popup p{
+				line-height: .88rem;
+				text-align: center;
+				font-size: 14px;
+			}
+			.mint-popup p.border{
+				border-bottom: 1px solid #EFEFEF;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="um-win" id="uploadImg" v-cloak>
+			<div class="um-content uploadImg">
+				<ul>
+					<li @click="openPopup('apply')">
+						<div><img v-if="list.applyImg" :src="list.applyImg" alt="">
+						<i class="icon iconfont icon-add"></i></div>
+						<p>融资租赁申请表</p>
+					</li>
+					<li @click="openPopup('marry')">
+						<div><img v-if="list.marryImg"  :src="list.marryImg" alt="">
+						<i class="icon iconfont icon-add"></i></div>
+						<p>结婚证明</p>
+					</li>
+					<li @click="openPopup('residence')">
+						<div><img v-if="list.residenceImg"  :src="list.residenceImg" alt="">
+						<i class="icon iconfont icon-add"></i></div>
+						<p>户口证明</p>
+
+					</li>
+					<li @click="openPopup('assets')">
+						<div><img v-if="list.assetsImg"  :src="list.assetsImg" alt="">
+						<i class="icon iconfont icon-add"></i></div>
+						<p>资产证明</p>
+					</li>
+					<li @click="openPopup('Interview')">
+						<div><img v-if="list.InterviewImg"  :src="list.InterviewImg" alt="">
+						<i class="icon iconfont icon-add"></i></div>
+						<p>面谈信息表</p>
+					</li>
+					<li @click="openPopup('other')">
+						<div><img v-if="list.otherImg"  :src="list.otherImg" alt="">
+						<i class="icon iconfont icon-add"></i></div>
+						<p>其他</p>
+					</li>
+				</ul>
+      </div>
+			<mt-popup v-model="popupVisible" position="bottom">
+					<p class='border' @click="openCame">打开相机</p>
+					<p class='border' @click="uploadImg">打开相册</p>
+					<p @click="claosePopup">取消</p>
+			</mt-popup>
+    </div>
+    <script>
+      $(function(){
+        new Vue({
+          el:'#uploadImg',
+          data(){
+            return {
+							list:{
+								applyImg:'',
+								marryImg:'',
+								residenceImg:'',
+								assetsImg:'',
+								InterviewImg:'',
+								otherImg:'',
+							},
+							popupVisible:false,
+							status:''
+            }
+          },
+					mounted(){
+
+					},
+					methods:{
+						openPopup(param){
+							this.popupVisible=true
+							this.status=param
+						},
+						claosePopup(){
+							this.popupVisible=false
+						},
+						openCame(){
+							// 打开相机
+							var that=this
+							summer.getPermission(["android.permission.CAMERA","android.permission.READ_PHONE_STATE","android.permission.WRITE_EXTERNAL_STORAGE"],
+								function successFn(){
+								},
+								function errorFn(err){
+									alert(err)
+							})
+							summer.openCamera({
+								compressionRatio:0.5,
+								callback : function(args){
+									// $summer.alert(args);
+								 // alert(args.imgPath);
+									if(that.status=='apply'){
+										that.list.applyImg=args.compressImgPath
+									}else if(that.status=='marry'){
+										that.list.marryImg=args.compressImgPath
+									}else if(that.status=='residence'){
+										that.list.residenceImg=args.compressImgPath
+									}else if(that.status=='assets'){
+										that.list.assetsImg=args.compressImgPath
+									}else if(that.status=='Interview'){
+										that.list.InterviewImg=args.compressImgPath
+									}else if(that.status=='other'){
+										that.list.otherImg=args.compressImgPath
+									}
+								}
+							});
+						},
+						uploadImg(){
+							// 选择相册
+							this.popupVisible=false
+							var that=this
+							summer.openPhotoAlbum({
+									compressionRatio:0.5,
+							    callback : function (args){
+							      // $summer.alert(args);
+							      // alert(args.imgPath);
+										if(that.status=='apply'){
+											that.list.applyImg=args.compressImgPath
+										}else if(that.status=='marry'){
+											that.list.marryImg=args.compressImgPath
+										}else if(that.status=='residence'){
+											that.list.residenceImg=args.compressImgPath
+										}else if(that.status=='assets'){
+											that.list.assetsImg=args.compressImgPath
+										}else if(that.status=='Interview'){
+											that.list.InterviewImg=args.compressImgPath
+										}else if(that.status=='other'){
+											that.list.otherImg=args.compressImgPath
+										}
+							    }
+							});
+						},
+						save(){
+							//http
+							summer.closeWin()
+						}
+					}
+        })
+
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="../../css/iuapmobile.um.css">
+		<link rel="stylesheet" href="../../css/font-icons.css">
+		<link rel="stylesheet" href="../../css/mint.css">
+		<script src="../../js/summer.js" ></script>
+		<script src="../../js/jquery.min.js" ></script>
+		<script src="../../js/vue.js" ></script>
+		<script src="../../js/mint.js" ></script>
+		<script src="../../js/font.js" ></script>
+		<script src="../../js/Frameworks/iuapmobile.frameworks.ui.js" ></script>
+		<style>
+		.um-list .um-list-item-body {
+			    align-self: center;
+			    line-height: 1rem;
+			    height: 1rem;
+			    padding: 0;
+			    font-size: 0.32rem;
+			    color: #485358;
+			    padding-left:0.3rem;
+			}
+
+		</style>
+
+
+	</head>
+	<body>
+		<div class="um-win" id="app">
+			<div class="um-content">
+      	<div class="um-list">
+					<a href="javascript:void(0);" class="um-list-item border"
+					onclick="openWin('setting')">
+					<div class="um-list-item-inner">
+						<div class="um-list-item-body">
+							客户信息
+						</div>
+					</div></a>
+					<a href="javascript:void(0);" class="um-list-item border"
+					onclick="checkVersion('baseMessage')">
+					<div class="um-list-item-inner">
+						<div class="um-list-item-body">
+							项目基础信息
+						</div>
+					</div> </a>
+					<a href="javascript:void(0);" class="um-list-item border"
+					onclick="checkVersion('addCar')">
+					<div class="um-list-item-inner">
+						<div class="um-list-item-body">
+							添加车辆
+						</div>
+					</div></a>
+					<a href="javascript:void(0);" class="um-list-item border" id="version"
+					onclick="checkVersion('quotedPrice')">
+					<div class="um-list-item-inner">
+						<div class="um-list-item-body">
+							报价方案
+						</div>
+
+					</div></a>
+					<a href="javascript:void(0);" class="um-list-item border" id="version"
+					onclick="checkVersion('uploadImg')">
+					<div class="um-list-item-inner">
+						<div class="um-list-item-body">
+							上传评审资料
+						</div>
+
+					</div></a>
+					<a href="javascript:void(0);" class="um-list-item border" id="version"
+					onclick="addContact()">
+					<div class="um-list-item-inner">
+						<div class="um-list-item-body">
+							紧急联系人
+						</div>
+
+					</div></a>
+					<a href="javascript:void(0);" class="um-list-item border" id="version"
+					onclick="openSponsor()">
+					<div class="um-list-item-inner">
+						<div class="um-list-item-body">
+							担保人
+						</div>
+
+					</div></a>
+					<a href="javascript:void(0);" class="um-list-item border" id="version"
+					onclick="checkVersion('remark')">
+					<div class="um-list-item-inner">
+						<div class="um-list-item-body">
+							备注留言
+						</div>
+
+					</div></a>
+			</div>
+			</div>
+			 <!-- <div class="um-footer"id="footer">
+			         <button class="btn um-btn-primary" onclick="checkVersion('submitSure')">下一步</button>
+			        </div> -->
+		</div>
+		<script>
+			new Vue({
+		      el: '#app',
+		      data:{
+		      	message:{
+		      		username:'',
+		      		card:'',
+		      		sex:'',
+		      		address:'',
+		      		phone:'',
+		      		phoneAddress:''
+		      	}
+		      },
+		      methods: {
+		        handleClick: function() {
+		          this.$toast('Hello world!')
+		        },
+		        openPicker() {
+			        this.$refs.picker.open();
+			      }
+		      }
+		  })
+			function checkVersion(param){
+						var id=param,url='',title='';
+						if(param=='addCar'){
+							id='addCar';
+							url="html/touristsClient/addCar.html";
+							title='添加车辆';
+						}else if (param=='quotedPrice') {
+							url="html/priceCalculation/quotedPriceList.html";
+							title="选择报价方案"
+							summer.openWin({
+								id:id,
+								url:url,
+								create:false,
+								type:'actionBar',
+								actionBar: {
+									title:title,
+									titleColor: "#ffffff",
+									backgroundColor: "#039BE5",
+									leftItem:{
+											image: "img/back.png",
+											method:"",//返回按钮自定义事件
+											text:"返回",
+											textColor:"#ffffff"  //返回文字颜色，注意必须是6位数的颜色值。（3位数颜色值会不正常）
+									}
+								}
+							})
+							return
+						}else if(param=='uploadImg'){
+							url="html/fastReport/uploadImg.html";
+							title='资料上传';
+						}else if(param=='remark'){
+							url="html/fastReport/remark.html";
+							title='备注';
+						}else if(param=='baseMessage'){
+							url="html/fastReport/baseMessage.html";
+							title='基本信息';
+						}
+
+						summer.openWin({
+							id:id,
+							url:url,
+							create:false,
+							type:'actionBar',
+							actionBar: {
+								title:title,
+								titleColor: "#ffffff",
+								backgroundColor: "#039BE5",
+								leftItem:{
+										image: "img/back.png",
+										method:"",
+										text:"返回",
+										textColor:"#ffffff"
+								},
+								rightItems:[{
+									type:"text",
+									text:"保存",
+									textColor:"#ffffff" ,
+									method:"save()"
+								}]
+							}
+						})
+		}
+		function addContact(){
+			summer.openWin({
+				id:'emergencyContract',
+				url:"html/fastReport/addEmergencyContact.html",
+				create:false,
+				type:'actionBar',
+				actionBar: {
+					title:'添加紧急联系人',
+					titleColor: "#ffffff", //注意必须是6位数的颜色值。（3位数颜色值会不正常）
+					backgroundColor: "#007aff",
+					leftItem:{
+							image: "img/back.png",
+							method:"",//返回按钮自定义事件
+							text:"返回",
+							textColor:"#ffffff"  //返回文字颜色，注意必须是6位数的颜色值。（3位数颜色值会不正常）
+					},
+					rightItems:[{
+						type:"image",
+						image:"img/useplus.png",
+						method:"addEmergencyContract()"
+					}]
+				}
+			})
+		}
+		function openSponsor(){
+				summer.openWin({
+					id:'mySponsor',
+					url:'html/fastReport/mySponsor.html',
+					create:false,
+					type:'actionBar',
+					actionBar: {
+						title: "添加担保人",
+						titleColor: "#ffffff", //注意必须是6位数的颜色值。（3位数颜色值会不正常）
+						backgroundColor: "#007aff",
+						leftItem:{
+								image: "img/back.png",
+								method:"",//返回按钮自定义事件
+								text:"返回",
+								textColor:"#ffffff"  //返回文字颜色，注意必须是6位数的颜色值。（3位数颜色值会不正常）
+						},
+						rightItems:[{
+				          type:"image",
+				          image:"img/useplus.png",
+				          method:"addSponsor()"
+				      }]
+
+					}
+				});
+		}
+        	function	nextStopInput(){
+        			summer.openWin({
+							id:"submitSure",
+							url:"html/fastReport/submitSure.html",
+							create:false,
+							type:'actionBar',
+							actionBar: {
+								title:"提交确认",
+								titleColor: "#ffffff",
+								backgroundColor: "#039BE5",
+								leftItem:{
+										image: "img/back.png",
+										method:"",
+										text:"返回",
+										textColor:"#ffffff"
+								}
+							}
+						})
+        	}
+		</script>
+	</body>
+</html>
